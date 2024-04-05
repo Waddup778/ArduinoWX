@@ -118,6 +118,12 @@ double convertCelsius(double temperatureF) {
     return celsius; // return the value of the calculation as a double
 }
 
+float convertPressure(float pressureMb) {
+    float pressureAtm = pressureMb / 1000;
+
+    return pressureAtm;
+}
+
 
 void setup() {
     pinMode(windDir, INPUT);    // set pin as an input
@@ -135,7 +141,7 @@ void loop() {
     float windDirection = getSensorData(windDir, 1);
     double windSpeed = getSensorData(windSpd, 2);
     double temperature = convertCelsius(getSensorData(temp, 3));
-    float pressure = getSensorData(press, 4);
+    float pressure = convertPressure(getSensorData(press, 4));
 
     // Print all information to the serial monitor
     Serial.print("WIND DIRECTION= ");
