@@ -74,32 +74,61 @@ float sensorData[][5] = {
         {5.000, 100.000, 360.00, 128.0, 1050},
 };
 
-// Perform a simple calculation to determine the number of table rows. This is used later on in the code.
+//Perform a simple calculation to determine the number of table rows. This is used later on in the code.
+//sizeof() function returns the length of the 2D array. Used to figure out the limits of the data table.
+//Defined as a global variable for easy access in other functions.
+
 int tableRows = sizeof(sensorData) / sizeof(sensorData[0]);
 
-// Create the function to read the table value, and approximate the closest value to the sensor reading.
+/* ============================= FUNCTION =============================================================================
+ * FUNCTION NAME: readTable
+ *
+ * PURPOSE:
+ * REFERENCE DESIRED SENSOR READING TO KNOWN VALUES IN THE DATA ARRAY TO RETURN THE BEST MATCH DATA.
+ *
+ * ARGUMENTS:
+ * SENSOR READING AS A FLOAT TYPE
+ * COLUMN AS AN INTEGER
+ *
+ * THE SENSOR READING IS DIRECTLY FROM THE OUTPUT OF THE READ SENSOR.
+ *
+ * THE COLUMN IS THE CORRESPONDING COLUMN WHICH HOUSES THE MATCHING SENSOR'S REFERENCE DATA.
+ *
+*/
 float readTable(float sensorReading, int column) {
-    float closestValue = sensorData[0][column]; // initialize variable and set it to row 0, and the column to read.
-    // Calculate the difference between the sensor reading and the closest value available.
-    float minDifference = abs(sensorReading - closestValue);
+    float closestValue = sensorData[0][column];         // initialize variable and set it to row 0, and the column to read.
+
+    float minDifference = abs(sensorReading - closestValue);    //calculate the minimum difference between values
 
     // Create for loop structure to search the table and set the proper values
     for (int i = 1; i < tableRows; i++) {
+        //iterate in steps of 1, where i is less than the value of known table rows, increment add:
         float currentDiff = abs(sensorReading - sensorData[i][column]); //calculate the current difference for the row being read.
+
         if (currentDiff < minDifference) {
-            closestValue = sensorData[i][column];
-            minDifference = currentDiff;
+            // if the current difference is less than the minimum difference, do the following:
+            closestValue = sensorData[i][column];   // set the closest value to the sensor data to row i, and column
+            minDifference = currentDiff;            // set the min difference to the current difference, the repeat the loop until satisfied.
         }
     }
 
     return closestValue;    //return the output value of the for loop to be used elsewhere.
 }
 
-//Create a function to actually get the data from the table based on argument inputs.
-// ARGUMENTS:
-// pin is the sensor's arduino pin
-// index is the column in the table (which sensor to read)
-
+/* ============================= FUNCTION =============================================================================
+ * FUNCTION NAME: getSensorData
+ *
+ * PURPOSE:
+ * REFERENCE FUNCTION ARGUMENTS TO DETERMINE THE CORRECT VALUE TO RETURN
+ *
+ * ARGUMENTS:
+ * PIN: DATA PIN TO READ
+ * INDEX: COLUMN TO READ
+ *
+ * PIN IS THE CONNECTION PIN BETWEEN THE ARDUINO AND SENSOR
+ * INDEX IS THE COLUMN OF DATA TO READ
+ *
+*/
 float getSensorData(int pin, int index) {
     int voltageReading = analogRead(pin);  // read the analog output of the pin argument
     float voltage;
@@ -119,7 +148,7 @@ double convertCelsius(double temperatureF) {
 }
 
 float convertPressure(float pressureMb) {
-    float pressureAtm = pressureMb / 1000;
+    float pressureAtm = pressureMb / 1000;      //convert pressure from millibar to atmospheres
 
     return pressureAtm;
 }
@@ -138,29 +167,28 @@ void setup() {
 void loop() {
     // create variables and get values from the look-up table:
     // recall: getSensorData(pin to read, column/sensor to read)
-    float windDirection = getSensorData(windDir, 1);
-    double windSpeed = getSensorData(windSpd, 2);
-    double temperature = convertCelsius(getSensorData(temp, 3));
-    float pressure = convertPressure(getSensorData(press, 4));
-
+    float windDirection = getSensorData(windDir, 1);        //get the wind direction sensor data, store in floating point
+    double windSpeed = getSensorData(windSpd, 2);           //get the wind speed sensor data, store in double
+    double temperature = convertCelsius(getSensorData(temp, 3));    //get the temp data, store in double
+    float pressure = convertPressure(getSensorData(press, 4));      //get the pressure sensor data, store in float
     // Print all information to the serial monitor
-    Serial.print("WIND DIRECTION= ");
-    Serial.print(windDirection);
-    Serial.println(" DEGREES");
+    Serial.print("WIND DIRECTION= ");   //print text to the monitor
+    Serial.print(windDirection);        //print the variable value argument
+    Serial.println(" DEGREES");         //print the unit
 
-    Serial.print("WIND SPEED= ");
-    Serial.print(windSpeed);
-    Serial.println(" MPH");
+    Serial.print("WIND SPEED= ");       //print the text to the monitor
+    Serial.print(windSpeed);            //print the variable value argument
+    Serial.println(" MPH");             //print the unit
 
-    Serial.print("TEMPERATURE= ");
-    Serial.print(temperature);
-    Serial.println(" Degrees C");
+    Serial.print("TEMPERATURE= ");      //print the text to the monitor
+    Serial.print(temperature);          //print the variable value argument
+    Serial.println(" Degrees C");       //print the unit
 
-    Serial.print("PRESSURE= ");
-    Serial.print(pressure);
-    Serial.println(" ATM");
+    Serial.print("PRESSURE= ");         //print the text to the monitor
+    Serial.print(pressure);             //print the variable value argument
+    Serial.println(" ATM");             //print the unit
 
-    Serial.println("");
+    Serial.println("");                 //print a blank line
 
-    delay(2000);    //wait 2 seconds between readings
+    delay(2000);                    //wait 2 seconds between readings
 }
